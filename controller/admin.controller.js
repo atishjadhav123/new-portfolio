@@ -2,6 +2,7 @@ const asyncHanlder = require("express-async-handler")
 const { checkEmpty } = require("../utils/cheackEmpty")
 const Technology = require("../model/Technology")
 const Social = require("../model/Social")
+const Carousel = require("../model/Carousel")
 
 exports.addTechnology = asyncHanlder(async (req, res) => {
 
@@ -58,4 +59,48 @@ exports.deleteSocial = asyncHanlder(async (req, res) => {
     await Social.findByIdAndDelete(id)
     res.json({ message: "Social Delete Success" })
 
+})
+
+
+//add carousel
+exports.getAllCarousel = asyncHanlder(async (req, res) => {
+    const result = await Carousel.find()
+    res.status(200).json({ message: "blog fetch success", result })
+})
+exports.addCarousel = asyncHanlder(async (req, res) => {
+    upload(req, res, async err => {
+        if (err) {
+            res.status(400).json({ message: "multer error" })
+        }
+        await Carousel.create({ ...req.body, hero: req.file.filename })
+        res.status(201).json({ message: "blog create succes" })
+    })
+})
+exports.updateCarousel = asyncHanlder(async (req, res) => {
+    upload(req, res, async err => {
+        if (err) {
+            return res.status(400).json({ message: "multer error" })
+        }
+        const { id } = req.params
+        if (req.body.remove) {
+
+            fs.unlinkSync(path.join(__dirname, "..", "uploads", req.body.remove))
+            await Carousel.findByIdAndUpdate(id, ({ ...req.body, hero: req.file.filename }))
+
+            res.status(200).json({ message: "blog update success" })
+        } else {
+
+            await Carousel.findByIdAndUpdate(id, req.body)
+            res.status(200).json({ message: "blog update success" })
+
+        }
+
+    })
+})
+exports.deleteCarousel = asyncHanlder(async (req, res) => {
+    const { id } = req.params
+    const result = await Carousel.findById(id)
+    fs.unlinkSync(path.join(__dirname, "..", "uploads", result.hero))
+    await Carousel.findByIdAndDelete(id)
+    res.status(200).json({ message: "blog delete success" })
 })
