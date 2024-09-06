@@ -4,7 +4,7 @@ const router = require("express").Router()
 
 router
 
-    // .post("/register", authController.registerUser)
+    .post("/register", authController.registerUser)
     .post("/login", authController.loginUser)
     .post("/logout", authController.logoutUser)
 
