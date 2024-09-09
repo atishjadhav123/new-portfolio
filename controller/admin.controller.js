@@ -73,24 +73,28 @@ exports.getAllCarousel = asyncHanlder(async (req, res) => {
 exports.addCarousel = asyncHanlder(async (req, res) => {
     upload(req, res, async (err) => {
         if (err) {
-            console.log(err)
-            return res.status(400).json({ message: "upload Error", error: err.message })
-        }
-        const { caption } = req.body
-        const { isError, error } = checkEmpty({ caption })
-        if (isError) {
-            return res.status(400).json({ message: "All Feild Required ", error })
-        }
-        if (req.file.hero) {
-            return res.status(400).json({ message: "Hero Image Is Required" })
+            console.log(err);
+            return res.status(400).json({ message: "upload Error", error: err.message });
         }
 
-        // console.log(req.file.path)
-        const { secure_url } = await cloudinary.uploader.upload(req.file.path)
-        const result = await Carousel.create({ ...req.body, hero: secure_url })
-        res.json({ message: "Carousel Add Success", result })
-    })
-})
+        const { caption } = req.body;
+        const { isError, error } = checkEmpty({ caption });
+        if (isError) {
+            return res.status(400).json({ message: "All Fields Required", error });
+        }
+
+        if (!req.file) {
+            return res.status(400).json({ message: "Hero Image Is Required" });
+        }
+
+        const { secure_url } = await cloudinary.uploader.upload(req.file.path);
+        const result = await Carousel.create({ ...req.body, hero: secure_url });
+        res.json({ message: "Carousel Add Success", result });
+    });
+});
+
+
+
 
 exports.updateCarousel = asyncHanlder(async (req, res) => {
     upload(req, res, async err => {
